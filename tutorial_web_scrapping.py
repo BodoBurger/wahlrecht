@@ -17,12 +17,10 @@ wiki = "https://en.wikipedia.org/wiki/List_of_state_and_union_territory_capitals
 r = http.request('GET', wiki)
 r.data
 
-
 #%%
 from bs4 import BeautifulSoup
 
-soup = BeautifulSoup(r.data)
-
+soup = BeautifulSoup(r.data, "html5lib")
 print(soup.prettify())
 
 #%% Looking at the data
@@ -36,7 +34,7 @@ for link in all_links:
 #%% Extracting table content
 all_tables = soup.find_all('table')
 
-main_table = soup.find('table', class_='wikitable sortable plainrowheaders')	
+main_table = soup.find('table', class_='wikitable sortable plainrowheaders')
 main_table
 
 rows = main_table.find_all('tr')
@@ -66,4 +64,3 @@ df['Judiciary_Capital']=E
 df['Year_Capital']=F
 df['Former_Capital']=G
 df.head()
-
