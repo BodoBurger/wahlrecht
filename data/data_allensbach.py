@@ -9,17 +9,9 @@ import urllib3
 import certifi 
 import pandas as pd
 
+from data.urls_sonntagsfrage import URL_ALLENSBACH
 
 #%%
-URL_ALLENSBACH = {'2017': 'http://www.wahlrecht.de/umfragen/allensbach.htm',
-                   '2013': 'http://www.wahlrecht.de/umfragen/allensbach/2013.htm',
-                   '2013o': 'http://www.wahlrecht.de/umfragen/allensbach/2013o.htm',
-                   '2013w': 'http://www.wahlrecht.de/umfragen/allensbach/2013w.htm',
-                   '2009': 'http://www.wahlrecht.de/umfragen/allensbach/2009.htm',
-                   '2005': 'http://www.wahlrecht.de/umfragen/allensbach/2005.htm',
-                   '2002': 'http://www.wahlrecht.de/umfragen/allensbach/2002.htm',
-                   }
-
 http = urllib3.PoolManager(cert_reqs='CERT_REQUIRED', ca_certs=certifi.where())
 
 
