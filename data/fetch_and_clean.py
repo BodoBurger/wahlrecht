@@ -17,6 +17,8 @@ def get_table(url, table_number = 1):
     """
     """
     r = http.request('GET', url)
+    #table = pd.read_html(r.data, parse_dates=True, decimal=',', thousands = '.')[table_number]
+    # Does not parse dates in correct form
     table = pd.read_html(r.data)[table_number]
     
     return table
@@ -26,12 +28,19 @@ def cleaning_table(table, columns_to_drop = None, rows_to_drop = None, party_col
     """
     table: pandas DataFrame
     
-    columns_to_drop: list with indices of empty columns
-    rows_to_drop: list of rows that contain non-sensical entries
+    columns_to_drop: list with indices of empty columns to drop manually
+    rows_to_drop: list of rows that contain non-sensical entries to drop manually
     party_columns: list of indices of columns that contain parties
     """
+    
+    table = table.rename(columns={'\xa0': 'Veröffentlichung', 'Unnamed: 0': 'Veröffentlichung'})
+    table['Veröffentlichung'] = pd.to_datetime(table['Veröffentlichung'], format='%d.%m.%Y', 
+         errors='coerce')
+    
     # cleaning rows
-    table = table.query('Befragte != "Bundestagswahl" and Befragte != "Befragte"')
+    table = table.dropna(subset=['Veröffentlichung'])
+    if 'Befragte' in table.columns:
+        table = table.query('Befragte != "Bundestagswahl"')
     if rows_to_drop:
         table = table.drop(rows_to_drop, axis=0)
 
@@ -40,20 +49,26 @@ def cleaning_table(table, columns_to_drop = None, rows_to_drop = None, party_col
     if columns_to_drop:
         table = table.drop(table.columns[columns_to_drop], axis=1)
     
-    table.index = pd.to_datetime(table.iloc[:, 0], format='%d.%m.%Y')
-    table = table.drop('Unnamed: 0', axis=1)
-    
     # clean party columns
     if party_columns:
         columns = table.columns.values[party_columns]
     else:
         columns = []
         for col in table.columns.values:
-            if col not in ['Befragte', 'Zeitraum']:
+            if col not in ['Veröffentlichung', 'Befragte', 'Zeitraum']:
                 columns.append(col)
     for col in columns:
-        table[col] = pd.to_numeric(table[col].str.replace('%', '').str.replace(',', '.').str.replace('–', ''))
+        table[col] = pd.to_numeric(
+                table[col].str.replace('%', '').str.replace(',', '.').str.replace('–', '')
+                )
     
-    table['Befragte'] = pd.to_numeric(table['Befragte'].str.replace('≈', '').str.replace('?', '').str.replace('.', ''))
-    
+    # clean 'Befragte'
+    if 'Befragte' in table.columns:
+        if table['Befragte'].dtype == 'object':
+            table['Befragte'] = pd.to_numeric(
+                    table['Befragte'].str.replace('≈|~|\?|\.|>', '')
+                    )
+        elif table['Befragte'].dtype == 'float64':
+            # this is only a hack because you cannot specify dtype in read_html
+            table['Befragte'] = table['Befragte'].apply(lambda x: 1000*x if x < 10 else x)
     return table
