@@ -9,7 +9,6 @@ import pandas as pd
 from data.fetch_and_clean import get_table, cleaning_table
 from data.urls_sonntagsfrage import SONNTAGSFRAGE_URL
 
-#%%
 tables_full = []
 
 #%% fetch allensbach
@@ -22,7 +21,7 @@ for year in SONNTAGSFRAGE_URL[inst].keys():
     tables.append(cleaning_table(table))
 
 
-table_full = pd.concat(tables, ignore_index=True)
+table_full = pd.concat(tables, ignore_index=True, sort=False)
 table_full['Institut'] = inst
 
 tables_full.append(table_full)
@@ -36,28 +35,31 @@ for year in SONNTAGSFRAGE_URL[inst].keys():
     table = get_table(SONNTAGSFRAGE_URL[inst][year])
     tables.append(cleaning_table(table))
 
-table_full = pd.concat(tables, ignore_index=True)
+table_full = pd.concat(tables, ignore_index=True, sort=False)
 table_full['Institut'] = inst
 
 tables_full.append(table_full)
 
+#%% fetch forsa
+inst = 'forsa'
+tables = []
+
+for year in SONNTAGSFRAGE_URL[inst].keys():
+    print(year)
+    table = get_table(SONNTAGSFRAGE_URL[inst][year])
+    tables.append(cleaning_table(table))
+
+table_full = pd.concat(tables, ignore_index=True, sort=False)
+table_full['Institut'] = inst
+
+tables_full.append(table_full)
+
+
 #%%
-data_all = pd.concat(tables_full)
+data_all = pd.concat(tables_full, sort=False)
 
 data_all = data_all.set_index(['Veröffentlichung', 'Institut'])
 
-##%%
-#table = get_table(SONNTAGSFRAGE_URL['emnid']['1998'])
-#table_clean_1998 = cleaning_table(table)
-#
-##%%
-#table = get_table(SONNTAGSFRAGE_URL['emnid']['2003'])
-#table_clean_2003 = cleaning_table(table)
-#
-##%% cleaning 2013
-#table = get_table(SONNTAGSFRAGE_URL['emnid']['2013'])
-#table_clean_2013 = cleaning_table(table)
-#
-##%% cleaning 2008
-#table = get_table(SONNTAGSFRAGE_URL['emnid']['2008'])
-#table_clean_2008 = cleaning_table(table)
+#%%
+
+

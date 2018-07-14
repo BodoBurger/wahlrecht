@@ -9,9 +9,9 @@ import pandas as pd
 from data.fetch_and_clean import get_table, cleaning_table
 from data.urls_sonntagsfrage import SONNTAGSFRAGE_URL
 
-#%% cleaning 2017
-table = get_table(SONNTAGSFRAGE_URL['emnid']['2017'])
-table_clean_2017 = cleaning_table(table)
+#%% cleaning aktuell
+table = get_table(SONNTAGSFRAGE_URL['emnid']['aktuell'])
+table_clean_aktuell = cleaning_table(table)
 
 #%% cleaning 2013
 table = get_table(SONNTAGSFRAGE_URL['emnid']['2013'])
